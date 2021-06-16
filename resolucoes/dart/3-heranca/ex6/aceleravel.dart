@@ -1,0 +1,3 @@
+mixin Aceleravel {
+  acelerar();
+}
