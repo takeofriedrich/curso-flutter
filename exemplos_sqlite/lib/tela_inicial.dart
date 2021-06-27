@@ -15,7 +15,7 @@ class _TelaInicialState extends State<TelaInicial> {
   @override
   void initState() {
     super.initState();
-    BancoDeDados.instance.openDb().whenComplete(carregar);
+    BancoDeDados().openDb().whenComplete(carregar);
   }
 
   Future<void> carregar() async {
@@ -85,7 +85,7 @@ class _TelaInicialState extends State<TelaInicial> {
 
   _pessoasWidget(int index) {
     return ListTile(
-      title: Text(controller.pessoas[index].nome),
+      title: Text(controller.pessoas[index].nome!),
       trailing: IconButton(
         icon: Icon(Icons.clear),
         onPressed: () {

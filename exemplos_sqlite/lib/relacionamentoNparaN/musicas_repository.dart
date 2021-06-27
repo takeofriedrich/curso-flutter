@@ -8,12 +8,11 @@ class MusicasRepository {
 
   final String sqlSelectFeat = 'select * from feats where codM = ?';
 
-  Future<List<int>> selectCodAMusicas(int codM) async {
-    List<int> codAs = [];
-    await BancoDeDados.instance.db
-        .rawQuery(sqlSelectFeat, [codM]).then((value) {
+  Future<List<int?>> selectCodAMusicas(int? codM) async {
+    List<int?> codAs = [];
+    await BancoDeDados().db!.rawQuery(sqlSelectFeat, [codM]).then((value) {
       value.forEach((element) {
-        codAs.add(element['codA']);
+        codAs.add(element['codA'] as int?);
       });
     });
     return codAs;
@@ -23,12 +22,12 @@ class MusicasRepository {
 
   Future<List<Musica>> selectAll() async {
     List<Musica> musicas = [];
-    await BancoDeDados.instance.db.rawQuery(sqlSelect).then((value) async {
+    await BancoDeDados().db!.rawQuery(sqlSelect).then((value) async {
       for (int i = 0; i < value.length; i++) {
-        List<int> codAs = await selectCodAMusicas(value[i]['codM'] as int);
+        List<int?> codAs = await selectCodAMusicas(value[i]['codM'] as int?);
         Musica m = Musica.fromJson(value[i]);
         for (int j = 0; j < codAs.length; j++) {
-          Artista a = await artistasRepository.select(codAs[i]);
+          Artista? a = await artistasRepository.select(codAs[i]);
           m.artistas.add(a);
         }
         musicas.add(m);
@@ -40,20 +39,20 @@ class MusicasRepository {
   final String sqlInsert = 'insert into musicas (nome) values (?);';
 
   Future<void> insert(Musica musica) async {
-    await BancoDeDados.instance.db.rawInsert(sqlInsert, [musica.nome]);
+    await BancoDeDados().db!.rawInsert(sqlInsert, [musica.nome]);
   }
 
   final String sqlInsertFeats = 'insert into feats (codM,codA) values (?,?);';
 
   Future<void> inserirFeat(int codM, int codA) async {
-    await BancoDeDados.instance.db.rawInsert(sqlInsertFeats, [codM, codA]);
+    await BancoDeDados().db!.rawInsert(sqlInsertFeats, [codM, codA]);
   }
 
   final String sqlDelete = 'delete from musicas where codM = ?';
   final String sqlDeleteFeats = 'delete from feats where codM = ?';
 
   Future<void> delete(Musica musica) async {
-    await BancoDeDados.instance.db.rawDelete(sqlDelete, [musica.codM]);
-    await BancoDeDados.instance.db.rawDelete(sqlDeleteFeats, [musica.codM]);
+    await BancoDeDados().db!.rawDelete(sqlDelete, [musica.codM]);
+    await BancoDeDados().db!.rawDelete(sqlDeleteFeats, [musica.codM]);
   }
 }

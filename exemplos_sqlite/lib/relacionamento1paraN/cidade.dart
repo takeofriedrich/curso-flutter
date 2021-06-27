@@ -1,6 +1,6 @@
 class Cidade {
-  int codC;
-  String nome;
+  int? codC;
+  String? nome;
 
   Cidade();
 

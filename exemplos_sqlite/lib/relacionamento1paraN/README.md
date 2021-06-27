@@ -21,8 +21,8 @@ A partir disso, vamos criar as classes Estado e Cidade em Dart:
 
     class Estado{
 
-        int codE;
-        String nome;
+        int? codE;
+        String? nome;
         List<Cidade> cidades = [];
 
         Estado();
@@ -36,8 +36,8 @@ A partir disso, vamos criar as classes Estado e Cidade em Dart:
 
     class Cidade{
 
-        int codC;
-        String nome;
+        int? codC;
+        String? nome;
 
         Cidade();
 
@@ -93,7 +93,7 @@ A partir dessa String, substituiremos o codE passado como parâmetro:
         Future<List<Cidade>> selectCidadesEstado(int codE) async {
             List<Cidade> cidades = [];
 
-            await BancoDeDados.instance.db.rawQuery(sqlSelect, [codE]).then((value) {
+            await BancoDeDados().db!.rawQuery(sqlSelect, [codE]).then((value) {
                 value.forEach((element) {
                     cidades.add(Cidade.fromJson(element));
                 });
@@ -120,7 +120,7 @@ Note que essa SQL irá trazer um inteiro (o codE) e uma String (o nome). Utiliza
 
         Future<List<Estado>> selectAll() async {
             List<Estado> estados = [];
-            await BancoDeDados.instance.db.rawQuery(sqlSelect).then((value) async {
+            await BancoDeDados().db!.rawQuery(sqlSelect).then((value) async {
                 for (int i = 0; i < value.length; i++) {
                     int codE = value[i]['codE'];
                     Estado e = Estado.fromJson(value[i]);
@@ -141,19 +141,21 @@ O método que foge um pouco a regra são os de **delete()**. No caso, o método 
 
     final String sqlDelete = 'delete from estados where codE = ?';
 
-    void delete(Estado estado) async {
+    Future<void> delete(Estado estado) async {
         for (int i = 0; i < estado.cidades.length; i++) {
             cidadesRepository.delete(estado.cidades[i]);
         }
-        await BancoDeDados.instance.db.rawDelete(sqlDelete, [estado.codE]);
+        await BancoDeDados().db!.rawDelete(sqlDelete, [estado.codE]);
+        return;
     }
 
 E por fim a implementação do método **delete()** da classe CidadesRepository:
 
     final String sqlDelete = 'delete from cidades where codC = ?';
 
-    void delete(Cidade cidade) async {
-        await BancoDeDados.instance.db.rawDelete(sqlDelete, [cidade.codC]);
+    Future<void> delete(Cidade cidade) async {
+        await BancoDeDados().db!.rawDelete(sqlDelete, [cidade.codC]);
+        return;
     }
 
 

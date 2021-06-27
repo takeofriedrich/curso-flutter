@@ -1,9 +1,9 @@
 import 'package:aula_bd/relacionamentoNparaN/artista.dart';
 
 class Musica {
-  int codM;
-  String nome;
-  List<Artista> artistas = [];
+  int? codM;
+  String? nome;
+  List<Artista?> artistas = [];
 
   Musica();
 

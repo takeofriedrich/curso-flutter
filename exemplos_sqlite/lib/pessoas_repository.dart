@@ -4,9 +4,7 @@ import 'package:aula_bd/pessoa.dart';
 class PessoasRepository {
   Future<List<Pessoa>> selectAll() async {
     List<Pessoa> pessoas = [];
-    await BancoDeDados.instance.db
-        .rawQuery('select * from pessoas')
-        .then((value) {
+    await BancoDeDados().db!.rawQuery('select * from pessoas').then((value) {
       value.forEach((element) {
         pessoas.add(Pessoa.fromMap(element));
       });
@@ -15,17 +13,22 @@ class PessoasRepository {
   }
 
   Future<void> insert(Pessoa pessoa) async {
-    return await BancoDeDados.instance.db
+    await BancoDeDados()
+        .db!
         .rawInsert('insert into pessoas (nome) values (?);', [pessoa.nome]);
+    return;
   }
 
   Future<void> update(Pessoa pessoa) async {
-    return await BancoDeDados.instance.db.rawUpdate(
+    await BancoDeDados().db!.rawUpdate(
         'update pessoas set nome = ? where id = ?', [pessoa.nome, pessoa.id]);
+    return;
   }
 
   Future<void> delete(Pessoa pessoa) async {
-    return await BancoDeDados.instance.db
+    await BancoDeDados()
+        .db!
         .rawDelete('delete from pessoas where id = ?;', [pessoa.id]);
+    return;
   }
 }

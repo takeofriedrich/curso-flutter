@@ -5,10 +5,10 @@ import 'cidade.dart';
 class CidadesRepository {
   final String sqlSelect = 'select * from cidades where codE = ?';
 
-  Future<List<Cidade>> selectCidadesEstado(int codE) async {
+  Future<List<Cidade>> selectCidadesEstado(int? codE) async {
     List<Cidade> cidades = [];
 
-    await BancoDeDados.instance.db.rawQuery(sqlSelect, [codE]).then((value) {
+    await BancoDeDados().db!.rawQuery(sqlSelect, [codE]).then((value) {
       value.forEach((element) {
         cidades.add(Cidade.fromJson(element));
       });
@@ -19,20 +19,22 @@ class CidadesRepository {
 
   final String sqlInsert = 'insert into cidades (nome,codE) values (?,?)';
 
-  void insert(Cidade cidade, int codE) async {
-    await BancoDeDados.instance.db.rawInsert(sqlInsert, [cidade.nome, codE]);
+  Future<void> insert(Cidade cidade, int codE) async {
+    await BancoDeDados().db!.rawInsert(sqlInsert, [cidade.nome, codE]);
+    return;
   }
 
   final String sqlUpdate = 'update cidades set nome = ? where codC = ?';
 
-  void update(Cidade cidade) async {
-    await BancoDeDados.instance.db
-        .rawUpdate(sqlUpdate, [cidade.nome, cidade.codC]);
+  Future<void> update(Cidade cidade) async {
+    await BancoDeDados().db!.rawUpdate(sqlUpdate, [cidade.nome, cidade.codC]);
+    return;
   }
 
   final String sqlDelete = 'delete from cidades where codC = ?';
 
-  void delete(Cidade cidade) async {
-    await BancoDeDados.instance.db.rawDelete(sqlDelete, [cidade.codC]);
+  Future<void> delete(Cidade cidade) async {
+    await BancoDeDados().db!.rawDelete(sqlDelete, [cidade.codC]);
+    return;
   }
 }

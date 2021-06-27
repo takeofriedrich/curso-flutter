@@ -1,8 +1,8 @@
 import 'cidade.dart';
 
 class Estado {
-  int codE;
-  String nome;
+  int? codE;
+  String? nome;
   List<Cidade> cidades = [];
 
   Estado();

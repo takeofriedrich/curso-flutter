@@ -25,8 +25,8 @@ Temos as três tabelas:
 Começaremos criando as classes que representam essas entidades:
 
     class Artista {
-        int codA;
-        String nome;
+        int? codA;
+        String? nome;
         List<Musica> musicas = [];
 
         Artista();
@@ -38,8 +38,8 @@ Começaremos criando as classes que representam essas entidades:
     }
 
     class Musica {
-        int codM;
-        String nome;
+        int? codM;
+        String? nome;
         List<Artista> artistas = [];
 
         Musica();
@@ -67,17 +67,18 @@ Em seguida, precisamos redefinir a classe BancoDeDados para que agora as tabelas
         db.execute(onCreateFeats);
     }
 
-    BancoDeDados._internal() {
-        getDatabasesPath().then((value) {
-            String path = value += 'exemplo4.db';
-            openDatabase(
-                path,
-                version: 1,
-                onCreate: onCreateFunction,
-            ).then((value) {
-                db = value;
+    Future<void> openDb() async {
+        if(db == null)
+            getDatabasesPath().then((value) {
+                String path = value += 'exemplo4.db';
+                openDatabase(
+                    path,
+                    version: 1,
+                    onCreate: onCreateFunction,
+                ).then((value) {
+                    db = value;
+                });
             });
-        });
     }
 
 Agora, começaremos a criar os Repository's. Para esse tipo de relacionamento, há duas formas de se fazer, na verdade existem outras, porém iremos fazer com que a classe MusicasRepository administre a tabela **feats**. Tanto que nem faremos na classe ArtistasRepository um método **selectAll()**, apenas faremos na classe MusicasRepository.
@@ -90,7 +91,7 @@ Começaremos na classe ArtistasRepository implementando o método **select()**, 
 
         Future<Artista> select(int codA) async {
             Artista a;
-            await BancoDeDados.instance.db.rawQuery(sqlSelect, [codA]).then((value) {
+            await BancoDeDados().db!.rawQuery(sqlSelect, [codA]).then((value) {
                 value.forEach((element) {
                     a = Artista.fromJson(element);
                 });
@@ -110,7 +111,7 @@ Note que não fizemos nada tão diferente do que já temos visto até agora. Far
 
         Future<List<int>> selectCodAMusicas(int codM) async {
             List<int> codAs = [];
-            await BancoDeDados.instance.db
+            await BancoDeDados().db!
                 .rawQuery(sqlSelectFeat, [codM]).then((value) {
                 value.forEach((element) {
                     codAs.add(element['codA']);
@@ -125,7 +126,7 @@ Note que não fizemos nada tão diferente do que já temos visto até agora. Far
 
     Future<List<Musica>> selectAll() async {
         List<Musica> musicas = [];
-        await BancoDeDados.instance.db.rawQuery(sqlSelect).then((value) async {
+        await BancoDeDados().db!.rawQuery(sqlSelect).then((value) async {
             for (int i = 0; i < value.length; i++) {
                 List<int> codAs = await selectCodAMusicas(value[i]['codM'] as int);
                 Musica m = Musica.fromJson(value[i]);
@@ -148,13 +149,15 @@ Faremos em seguida os métodos de **insert()**, criando um para cada classe e um
     final String sqlInsert = 'insert into musicas (nome) values (?);';
 
     Future<void> insert(Musica musica) async {
-        await BancoDeDados.instance.db.rawInsert(sqlInsert, [musica.nome]);
+        await BancoDeDados().db!.rawInsert(sqlInsert, [musica.nome]);
+        return;
     }
 
     final String sqlInsertFeats = 'insert into feats (codM,codA) values (?,?);';
 
     Future<void> inserirFeat(int codM, int codA) async {
-        await BancoDeDados.instance.db.rawInsert(sqlInsertFeats, [codM, codA]);
+        await BancoDeDados().db!.rawInsert(sqlInsertFeats, [codM, codA]);
+        return;
     }
 
 Já o da classe ArtistasRepository tem a seguinte implementação:
@@ -162,7 +165,8 @@ Já o da classe ArtistasRepository tem a seguinte implementação:
     final String sqlInsert = 'insert into artistas (nome) values (?);';
 
     Future<void> insert(Artista artista) async {
-        await BancoDeDados.instance.db.rawInsert(sqlInsert, [artista.nome]);
+        await BancoDeDados().db!.rawInsert(sqlInsert, [artista.nome]);
+        return;
     }
 
 Nada muito diferente do que já vinhamos fazendo até agora.
@@ -173,8 +177,9 @@ Agora faremos os métodos de **delete()**, a única diferença com o que haviamo
     final String sqlDeleteFeats = 'delete from feats where codM = ?';
 
     Future<void> delete(Musica musica) async {
-        await BancoDeDados.instance.db.rawDelete(sqlDelete, [musica.codM]);
-        await BancoDeDados.instance.db.rawDelete(sqlDeleteFeats, [musica.codM]);
+        await BancoDeDados().db!.rawDelete(sqlDelete, [musica.codM]);
+        await BancoDeDados().db!.rawDelete(sqlDeleteFeats, [musica.codM]);
+        return;
     }
 
 Na ArtistasRepository, a mesma lógica:
@@ -183,6 +188,7 @@ Na ArtistasRepository, a mesma lógica:
     final String sqlDeleteFeats = 'delete from feats where codA = ?';
 
     Future<void> delete(Artista artista) async {
-        await BancoDeDados.instance.db.rawDelete(sqlDelete, [artista.codA]);
-        await BancoDeDados.instance.db.rawDelete(sqlDeleteFeats, [artista.codA]);
+        await BancoDeDados().db!.rawDelete(sqlDelete, [artista.codA]);
+        await BancoDeDados().db!.rawDelete(sqlDeleteFeats, [artista.codA]);
+        return;
     }

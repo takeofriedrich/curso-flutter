@@ -1,8 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 
 class BancoDeDados {
-  static BancoDeDados _instance;
-  Database db;
+  static BancoDeDados? _instance;
+  Database? db;
 
   final String onCreateSQL =
       'create table pessoas(id INTEGER PRIMARY KEY AUTOINCREMENT,nome TEXT);';
@@ -25,10 +25,9 @@ class BancoDeDados {
       });
   }
 
-  BancoDeDados._internal();
+  BancoDeDados._();
 
-  static BancoDeDados get instance {
-    if (_instance == null) _instance = BancoDeDados._internal();
-    return _instance;
+  factory BancoDeDados() {
+    return _instance ??= BancoDeDados._();
   }
 }
